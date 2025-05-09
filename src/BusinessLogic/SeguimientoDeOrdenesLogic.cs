@@ -136,6 +136,8 @@ namespace TrackingSystem.BusinessLogic
                 ClienteId = orden.ClienteId,
                 CodigoDeSeguimiento = orden.CodigoDeSeguimiento,
                 DireccionDeEntrega = orden.DireccionDeEntrega,
+                DireccionDeEntregaLat = orden.DireccionDeEntregaLat,
+                DireccionDeEntregaLon = orden.DireccionDeEntregaLon,
                 Estado = orden.Estado,
                 LugarDeEntrega = orden.LugarDeEntrega,
                 PesoEnKilos = orden.PesoEnKilos,

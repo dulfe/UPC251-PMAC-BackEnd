@@ -14,19 +14,25 @@ namespace TrackingSystem.Backend.Auth
     public class AuthenticationService : IAuthenticationService
     {
         readonly IdentitySettings _identitySettings;
+        readonly ILogger<AuthenticationService> _logger;
 
-        public AuthenticationService(IOptions<IdentitySettings> options)
+        public AuthenticationService(IOptions<IdentitySettings> options, ILogger<AuthenticationService> logger)
         {
+            this._logger = logger;
             _identitySettings = options.Value;
         }
         public async Task<AccessToken?> GenerateTokenAsync(string email, string password)
         {
+            _logger?.LogInformation("Token requested for {email}", email);
+
             using var client = new HttpClient();
 
-            var disco = await GetDicovertyDocumentAsync(client);
+            var disco = await GetDicovertyDocumentAsync(client).ConfigureAwait(false);
 
             if (!disco.IsError)
             {
+                _logger?.LogInformation("Discovery document retrieved successfully, requesting token for {email}", email);
+
                 var tokenResponse = await client.RequestPasswordTokenAsync(new PasswordTokenRequest
                 {
                     Address = disco.TokenEndpoint,
@@ -35,15 +41,21 @@ namespace TrackingSystem.Backend.Auth
                     Scope = "email offline_access",
                     UserName = email,
                     Password = password
-                });
+                }).ConfigureAwait(false);
 
 
                 if (tokenResponse.Json == null || tokenResponse.IsError)
                 {
+                    _logger?.LogError("Token request failed: {error}", tokenResponse.Error);
                     return null;
                 }
+
+                _logger?.LogInformation("Token retrieved successfully for {email}", email);
+
                 return tokenResponse.Json.Value.Deserialize<AccessToken>();
             }
+
+            _logger?.LogError("Discovery document retrieval failed: {error}", disco.Error);
 
             return null;
         }
@@ -51,7 +63,7 @@ namespace TrackingSystem.Backend.Auth
         public async Task<AccessToken?> GenerateTokenFromRefreshTokenAsync(string refreshToken)
         {
             using var client = new HttpClient();
-            var disco = await GetDicovertyDocumentAsync(client);
+            var disco = await GetDicovertyDocumentAsync(client).ConfigureAwait(false);
 
             if (!disco.IsError)
             {
@@ -61,7 +73,7 @@ namespace TrackingSystem.Backend.Auth
                     ClientId = _identitySettings.ClientID,
                     ClientSecret = _identitySettings.ClientSecret,
                     RefreshToken = refreshToken
-                });
+                }).ConfigureAwait(false);
 
 
                 if (tokenResponse.Json == null || tokenResponse.IsError)
@@ -87,7 +99,8 @@ namespace TrackingSystem.Backend.Auth
                         RequireHttps = false
                         }
                     }
-                );
+                )
+                .ConfigureAwait(false);
         }
     }
 }

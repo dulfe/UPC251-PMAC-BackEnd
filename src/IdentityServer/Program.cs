@@ -15,6 +15,9 @@ namespace TrackingSystem.IdentityServer
             // Obtener la configuración de la aplicación
             var config = builder.Configuration;
 
+            // Imprimir la configuración de la aplicación
+            PrintSettings(config);
+
             // Add services to the container.
 
             builder.Services.AddIdentityServer()
@@ -77,6 +80,20 @@ namespace TrackingSystem.IdentityServer
             //});
 
             app.Run();
+        }
+
+        private static void PrintSettings(IConfiguration config)
+        {
+            Console.WriteLine("Environment Variables:");
+            foreach (var env in Environment.GetEnvironmentVariables().Keys)
+            {
+                Console.WriteLine($"{env}: {Environment.GetEnvironmentVariable(env.ToString())}");
+            }
+            Console.WriteLine("\nAppSettings:");
+            foreach (var section in config.AsEnumerable())
+            {
+                Console.WriteLine($"{section.Key}: {section.Value}");
+            }
         }
     }
 }

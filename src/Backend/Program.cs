@@ -12,6 +12,7 @@ using AspNetCore.Swagger.Themes;
 using TrackingSystem.Backend.Auth;
 using Microsoft.AspNetCore.Diagnostics;
 using TrackingSystem.Backend.Entities;
+using System.Drawing.Printing;
 
 namespace TrackingSystem.Backend
 {
@@ -24,6 +25,8 @@ namespace TrackingSystem.Backend
             // Obtener la configuración de la aplicación
             var config = builder.Configuration;
 
+            // Imprimir la configuración de la aplicación
+            PrintSettings(config);
 
             // Definir Servicios (dependencias)
 
@@ -129,10 +132,10 @@ namespace TrackingSystem.Backend
             var app = builder.Build();
 
             // Configurar la canalización de solicitudes HTTP.
+            app.UseSwagger();
             if (app.Environment.IsDevelopment())
             {
                 // Habilitar la documentación de Swagger
-                app.UseSwagger();
                 app.UseSwaggerUI(ModernStyle.DeepSea);
             }
 
@@ -177,6 +180,20 @@ namespace TrackingSystem.Backend
 
             // Ejecutar la aplicación!
             app.Run();
+        }
+
+        private static void PrintSettings(IConfiguration config)
+        {
+            Console.WriteLine("Environment Variables:");
+            foreach (var env in Environment.GetEnvironmentVariables().Keys)
+            {
+                Console.WriteLine($"{env}: {Environment.GetEnvironmentVariable(env.ToString())}");
+            }
+            Console.WriteLine("\nAppSettings:");
+            foreach (var section in config.AsEnumerable())
+            {
+                Console.WriteLine($"{section.Key}: {section.Value}");
+            }
         }
     }
 }

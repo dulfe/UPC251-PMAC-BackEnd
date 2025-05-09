@@ -1,1 +1,5 @@
 src/IdentityServer/tempkey.jwk
+src/Backend/Properties/ServiceDependencies/trackingbe - Zip Deploy/
+src/IdentityServer/Properties/ServiceDependencies/trackingidentity - Zip Deploy/
+x.env.parameters.json
+src/Backend/Properties/serviceDependencies.trackingbe - Zip Deploy.json
